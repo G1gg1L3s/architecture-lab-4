@@ -5,15 +5,12 @@ import (
 	"fmt"
 	"io"
 	"strings"
+	. "../command"
 )
-
-type Command interface {
-	Execute()
-}
 
 type PlugCmd struct{}
 
-func (cmd *PlugCmd) Execute() {
+func (cmd *PlugCmd) Execute(_ Handler) {
 	fmt.Println("Executing...")
 }
 
