@@ -11,109 +11,132 @@ import (
 	. "../commands"
 )
 
+type tokenType int
+
+const (
+	num tokenType = iota
+	str
+	sym
+)
+
+type parseRule struct {
+	constructor func(args []interface{}) Command
+	rule        []tokenType
+}
+
+var parseTable = map[string]parseRule{
+	"print":     {rule: []tokenType{str}, constructor: printConst},
+	"printc":    {rule: []tokenType{num, sym}, constructor: printcConst},
+	"add":       {rule: []tokenType{num, num}, constructor: addConst},
+	"palindrom": {rule: []tokenType{str}, constructor: palindromeConst},
+	"split":     {rule: []tokenType{str, sym}, constructor: splitConst},
+	"reverse":   {rule: []tokenType{str}, constructor: reverseConst},
+	"sha1":      {rule: []tokenType{str}, constructor: sha1Const},
+	"delete":    {rule: []tokenType{str, sym}, constructor: deleteConst},
+	"cat":       {rule: []tokenType{str, str}, constructor: catConst},
+}
+
+func printConst(args []interface{}) Command {
+	arg := args[0].(string)
+	return &PrintCommand{Arg: arg}
+}
+
+func printcConst(args []interface{}) Command {
+	count := args[0].(int)
+	sym := args[1].(string)
+	return &PrintcCommand{Count: count, Symbol: sym}
+}
+
+func addConst(args []interface{}) Command {
+	arg1 := args[0].(int)
+	arg2 := args[1].(int)
+	return &AddCommand{Arg1: arg1, Arg2: arg2}
+}
+
+func palindromeConst(args []interface{}) Command {
+	arg := args[0].(string)
+	return &PalindromeCommand{Arg: arg}
+}
+
+func splitConst(args []interface{}) Command {
+	str := args[0].(string)
+	sep := args[1].(string)
+	return &SplitCommand{Str: str, Sep: sep}
+}
+
+func reverseConst(args []interface{}) Command {
+	arg := args[0].(string)
+	return &ReverseCommand{Arg: arg}
+}
+
+func sha1Const(args []interface{}) Command {
+	arg := args[0].(string)
+	return &Sha1Command{Arg: arg}
+}
+
+func deleteConst(args []interface{}) Command {
+	str := args[0].(string)
+	sym := args[1].(string)
+	return &DeleteCommand{Str: str, Symbol: sym}
+}
+
+func catConst(args []interface{}) Command {
+	arg1 := args[0].(string)
+	arg2 := args[1].(string)
+	return &CatCommand{Arg1: arg1, Arg2: arg2}
+}
+
 type Parser struct {
 	input *bufio.Scanner
 	line  int
 }
 
-func (p *Parser) parsePrint(rest string) Command {
-	return &PrintCommand{Arg: rest}
-}
-
-func (p *Parser) parseReverse(rest string) Command {
-	return &ReverseCommand{Arg: rest}
-}
-
-func (p *Parser) parsePalindrome(rest string) Command {
-	return &PalindromeCommand{Arg: rest}
-}
-
-func (p *Parser) parsePrintC(rest string) Command {
-	parts := strings.Fields(rest)
-	if len(parts) != 2 {
-		return p.errorCommand(fmt.Sprintf("Error in printc: expect 2 args"))
-	}
-	count, err := strconv.Atoi(parts[0])
-	if err != nil {
-		return p.errorCommand(fmt.Sprintf("Error parsing number: %s", err.Error()))
-	}
-	symbol := parts[1]
-	return &PrintcCommand{Count: count, Symbol: symbol}
-}
-
-func (p *Parser) parseAdd(rest string) Command {
-	parts := strings.Fields(rest)
-	if len(parts) != 2 {
-		return p.errorCommand(fmt.Sprintf("Error in add: expect 2 args"))
-	}
-	arg1, err := strconv.Atoi(parts[0])
-	if err != nil {
-		return p.errorCommand(fmt.Sprintf("Error parsing first number: %s", err.Error()))
-	}
-	arg2, err := strconv.Atoi(parts[1])
-	if err != nil {
-		return p.errorCommand(fmt.Sprintf("Error parsing second number: %s", err.Error()))
-	}
-	return &AddCommand{Arg1: arg1, Arg2: arg2}
-}
-
-func (p *Parser) parseSha1(rest string) Command {
-	if len(rest) == 0 {
-		return p.errorCommand(fmt.Sprintf("Expected string, found nothing"))
-	}
-	return &Sha1Command{Arg: rest}
-}
-
-func (p *Parser) parseSplit(rest string) Command {
-	parts := strings.Fields(rest)
-	if len(parts) != 2 {
-		return p.errorCommand(fmt.Sprintf("Error in split: expect 2 args"))
-	}
-	return &SplitCommand{Str: parts[0], Sep: parts[1]}
-}
-
-func (p *Parser) parseDelete(rest string) Command {
-	parts := strings.Fields(rest)
-	if len(parts) != 2 {
-		return p.errorCommand(fmt.Sprintf("Error in delete: expect 2 args"))
-	}
-	return &DeleteCommand{Str: parts[0], Symbol: parts[1]}
-}
-
-func (p *Parser) parseCat(rest string) Command {
-	parts := strings.Fields(rest)
-	if len(parts) != 2 {
-		return p.errorCommand(fmt.Sprintf("Error in cat: expect 2 args"))
-	}
-	return &CatCommand{Arg1: parts[0], Arg2: parts[1]}
-}
-
 func (p *Parser) parseLine(line string) Command {
-	cmd := strings.Fields(line)[0]
-	start := len(cmd)
-	rest := strings.Trim(line[start:], " ")
-	switch cmd {
-	case "print":
-		return p.parsePrint(rest)
-	case "add":
-		return p.parseAdd(rest)
-	case "palindrom":
-		return p.parsePalindrome(rest)
-	case "split":
-		return p.parseSplit(rest)
-	case "reverse":
-		return p.parseReverse(rest)
-	case "sha1":
-		return p.parseSha1(rest)
-	case "printc":
-		return p.parsePrintC(rest)
-	case "delete":
-		return p.parseDelete(rest)
-	case "cat":
-		return p.parseCat(rest)
-	default:
+	parts := strings.Fields(line)
+	cmd := parts[0]
+
+	rule, ok := parseTable[cmd]
+	if !ok {
 		return p.errorCommand(fmt.Sprintf("Unknown command: %s", cmd))
 	}
+	if len(rule.rule) == 1 && rule.rule[0] == str {
+		// The command receives only one argument - the whole string
+		start := len(cmd)
+		rest := strings.Trim(line[start:], " ")
+		return rule.constructor([]interface{}{rest})
+	}
+	parts = parts[1:]
+	if len(parts) != len(rule.rule) {
+		return p.errorCommand(fmt.Sprintf("Error in %s: expect %d args, got %d",
+			cmd,
+			len(rule.rule),
+			len(parts)),
+		)
+	}
+	return p.mathArgs(cmd, rule, parts)
+}
+
+func (p *Parser) mathArgs(cmd string, rule parseRule, args []string) Command {
+	res := []interface{}{}
+	for i := range rule.rule {
+		switch rule.rule[i] {
+		case num:
+			n, err := strconv.Atoi(args[i])
+			if err != nil {
+				return p.errorCommand(fmt.Sprintf("Error in %s while parsing number: %s", cmd, err.Error()))
+			}
+			res = append(res, n)
+		case str:
+			res = append(res, args[i])
+		case sym:
+			sym := args[i]
+			if len([]rune(sym)) != 1 {
+				return p.errorCommand(fmt.Sprintf("Error in %s: got string instead of single character", cmd))
+			}
+			res = append(res, args[i])
+		}
+	}
+	return rule.constructor(res)
 }
 
 func (p *Parser) Parse() []Command {
