@@ -2,6 +2,7 @@ package commandQueue
 
 import (
 	"sync"
+
 	. "../command"
 )
 
@@ -18,6 +19,7 @@ func (cq *CommandQueue) Push(cmd Command) {
 	cq.storage = append(cq.storage, cmd)
 	if cq.waiting {
 		cq.request <- struct{}{}
+		cq.waiting = false
 	}
 	return
 }
