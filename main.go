@@ -31,15 +31,5 @@ func main() {
 		}
 
 	}
-
-	// ev.Post(CommandFunc(func(h Handler) {
-	// 	fmt.Println("1")
-	// }))
-	// ev.Post(CommandFunc(func(h Handler) {
-	// 	fmt.Println("2")
-	// }))
-	// ev.Post(CommandFunc(func(h Handler) {
-	// 	fmt.Println("3")
-	// }))
 	ev.AwaitFinish()
 }

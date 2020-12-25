@@ -5,12 +5,12 @@ import (
 )
 
 type ReverseCommand struct {
-	arg string
+	Arg string
 }
 
 func (r *ReverseCommand) Execute(loop command.Handler) {
 	var reverse string
-	for _, v := range r.arg {
+	for _, v := range r.Arg {
 		reverse = string(v) + reverse
 	}
 	loop.Post(&PrintCommand{Arg: reverse})
