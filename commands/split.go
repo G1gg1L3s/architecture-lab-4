@@ -1,7 +1,8 @@
 package commands
 
 import (
-    s "strings"
+	s "strings"
+
 	"../command"
 )
 
@@ -11,7 +12,7 @@ type splitCommand struct {
 
 func (sp *splitCommand) Execute(loop command.Handler) {
 	split := s.Split(sp.str, sp.sep)
-	for _,v := range split {
-		loop.Post(&printCommand{arg: v})
+	for _, v := range split {
+		loop.Post(&PrintCommand{Arg: v})
 	}
 }

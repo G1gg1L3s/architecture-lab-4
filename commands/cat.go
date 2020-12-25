@@ -10,5 +10,5 @@ type catCommand struct {
 
 func (c *catCommand) Execute(loop command.Handler) {
 	concat := c.arg1 + c.arg2
-	loop.Post(&printCommand{arg: concat})
+	loop.Post(&PrintCommand{Arg: concat})
 }

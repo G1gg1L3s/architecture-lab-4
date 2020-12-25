@@ -5,14 +5,14 @@ import (
 )
 
 type palindromeCommand struct {
-	arg string
+	Arg string
 }
 
 func (p *palindromeCommand) Execute(loop command.Handler) {
 	var reverse string
-	for _,v := range p.arg {
+	for _, v := range p.Arg {
 		reverse = string(v) + reverse
 	}
-	palindrome := p.arg + reverse
-	loop.Post(&printCommand{arg: palindrome})
+	palindrome := p.Arg + reverse
+	loop.Post(&PrintCommand{Arg: palindrome})
 }

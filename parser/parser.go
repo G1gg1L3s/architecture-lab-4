@@ -5,14 +5,10 @@ import (
 	"fmt"
 	"io"
 	"strings"
+
 	. "../command"
+	. "../commands"
 )
-
-type PlugCmd struct{}
-
-func (cmd *PlugCmd) Execute(_ Handler) {
-	fmt.Println("Executing...")
-}
 
 type Parser struct {
 	input *bufio.Scanner
@@ -20,14 +16,14 @@ type Parser struct {
 }
 
 func (p *Parser) parsePrint(rest string) Command {
-	return &PlugCmd{}
+	return &PrintCommand{Arg: rest}
 }
 
 func (p *Parser) parseSha1(rest string) Command {
 	if len(rest) == 0 {
 		return p.errorCommand(fmt.Sprintf("Expected string, found nothing"))
 	}
-	return &PlugCmd{}
+	return &Sha1Command{Arg: rest}
 }
 
 func (p *Parser) parseLine(line string) Command {
@@ -43,7 +39,7 @@ func (p *Parser) parseLine(line string) Command {
 	}
 }
 
-func (p *Parser) parse() []Command {
+func (p *Parser) Parse() []Command {
 	res := []Command{}
 	for p.input.Scan() {
 		p.line++
@@ -66,6 +62,6 @@ func NewParser(reader io.Reader) Parser {
 }
 
 func (p *Parser) errorCommand(msg string) Command {
-	msg += fmt.Sprintf(" on line %d", p.line)
-	return &PlugCmd{}
+	msg += fmt.Sprintf(" on line %d\n", p.line)
+	return &ErrorCommand{Msg: msg}
 }

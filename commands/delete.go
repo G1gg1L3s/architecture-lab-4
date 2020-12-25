@@ -1,7 +1,8 @@
 package commands
 
 import (
-    s "strings"
+	s "strings"
+
 	"../command"
 )
 
@@ -11,5 +12,5 @@ type deleteCommand struct {
 
 func (d *deleteCommand) Execute(loop command.Handler) {
 	delete := s.Replace(d.str, d.symbol, "", -1)
-	loop.Post(&printCommand{arg: delete})
+	loop.Post(&PrintCommand{Arg: delete})
 }

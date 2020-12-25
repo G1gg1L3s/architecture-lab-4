@@ -10,8 +10,8 @@ type reverseCommand struct {
 
 func (r *reverseCommand) Execute(loop command.Handler) {
 	var reverse string
-	for _,v := range r.arg {
+	for _, v := range r.arg {
 		reverse = string(v) + reverse
 	}
-	loop.Post(&printCommand{arg: reverse})
-} 
+	loop.Post(&PrintCommand{Arg: reverse})
+}

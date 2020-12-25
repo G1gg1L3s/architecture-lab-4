@@ -2,18 +2,18 @@ package commands
 
 import (
 	"crypto/sha1"
-    "encoding/hex"
+	"encoding/hex"
+
 	"../command"
 )
 
-type sha1Command struct {
-	arg string
+type Sha1Command struct {
+	Arg string
 }
 
-func (s * sha1Command) Execute(loop command.Handler) {
+func (s *Sha1Command) Execute(loop command.Handler) {
 	h := sha1.New()
-	h.Write([]byte(s.arg))
+	h.Write([]byte(s.Arg))
 	sha1 := hex.EncodeToString(h.Sum(nil))
-	loop.Post(&printCommand{arg: sha1})
-} 
-	
+	loop.Post(&PrintCommand{Arg: sha1})
+}

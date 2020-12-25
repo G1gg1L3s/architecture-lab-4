@@ -2,13 +2,14 @@ package commands
 
 import (
 	"fmt"
+
 	"../command"
 )
 
-type printCommand struct {
-	arg string
+type PrintCommand struct {
+	Arg string
 }
-	
-func (p *printCommand) Execute(loop command.Handler) {
-	fmt.Println(p.arg)
-} 
+
+func (p *PrintCommand) Execute(loop command.Handler) {
+	fmt.Println(p.Arg)
+}
