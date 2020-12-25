@@ -4,11 +4,11 @@ import (
 	"../command"
 )
 
-type palindromeCommand struct {
+type PalindromeCommand struct {
 	Arg string
 }
 
-func (p *palindromeCommand) Execute(loop command.Handler) {
+func (p *PalindromeCommand) Execute(loop command.Handler) {
 	var reverse string
 	for _, v := range p.Arg {
 		reverse = string(v) + reverse

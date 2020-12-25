@@ -6,12 +6,12 @@ import (
 	"../command"
 )
 
-type printcCommand struct {
-	count  int
-	symbol string
+type PrintcCommand struct {
+	Count  int
+	Symbol string
 }
 
-func (p *printcCommand) Execute(loop command.Handler) {
-	printc := s.Repeat(p.symbol, p.count)
+func (p *PrintcCommand) Execute(loop command.Handler) {
+	printc := s.Repeat(p.Symbol, p.Count)
 	loop.Post(&PrintCommand{Arg: printc})
 }

@@ -4,11 +4,11 @@ import (
 	"../command"
 )
 
-type catCommand struct {
-	arg1, arg2 string
+type CatCommand struct {
+	Arg1, Arg2 string
 }
 
-func (c *catCommand) Execute(loop command.Handler) {
-	concat := c.arg1 + c.arg2
+func (c *CatCommand) Execute(loop command.Handler) {
+	concat := c.Arg1 + c.Arg2
 	loop.Post(&PrintCommand{Arg: concat})
 }

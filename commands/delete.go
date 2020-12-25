@@ -6,11 +6,11 @@ import (
 	"../command"
 )
 
-type deleteCommand struct {
-	str, symbol string
+type DeleteCommand struct {
+	Str, Symbol string
 }
 
-func (d *deleteCommand) Execute(loop command.Handler) {
-	delete := s.Replace(d.str, d.symbol, "", -1)
+func (d *DeleteCommand) Execute(loop command.Handler) {
+	delete := s.Replace(d.Str, d.Symbol, "", -1)
 	loop.Post(&PrintCommand{Arg: delete})
 }

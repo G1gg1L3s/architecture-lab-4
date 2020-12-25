@@ -6,12 +6,12 @@ import (
 	"../command"
 )
 
-type splitCommand struct {
-	str, sep string
+type SplitCommand struct {
+	Str, Sep string
 }
 
-func (sp *splitCommand) Execute(loop command.Handler) {
-	split := s.Split(sp.str, sp.sep)
+func (sp *SplitCommand) Execute(loop command.Handler) {
+	split := s.Split(sp.Str, sp.Sep)
 	for _, v := range split {
 		loop.Post(&PrintCommand{Arg: v})
 	}
